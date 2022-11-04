@@ -1,8 +1,17 @@
-interface Repository {
+import Card from '../components/Card';
+
+interface RawRepository {
     id: number;
     name: string;
     description: string;
     html_url: string;
+}
+
+interface Repository {
+    id: number;
+    name: string;
+    description: string;
+    githubUrl: string;
 }
 
 interface PageProps {
@@ -10,11 +19,15 @@ interface PageProps {
 }
 
 export default function Gateway({ repositories }: PageProps) {
-    console.log(repositories);
-
     return (
         <div>
-            Hello world!
+            <ul className="flex justify-center align-center ">
+                {repositories.map(repo => (
+                    <Card key={repo.id}>
+                        {repo.name}
+                    </Card>
+                ))}
+            </ul>
         </div>
     );
 }
@@ -26,14 +39,18 @@ export async function getStaticProps() {
         }
     });
 
-    const allRepositories: Repository[] = await response.json();
-
-    console.log(allRepositories);
+    const allRepositories: RawRepository[] = await response.json();
 
     return {
         revalidate: 86400,
         props: {
-            repositories: allRepositories.filter(repo => repo.name.startsWith('portal-')),
+            repositories: allRepositories.filter(repo => repo.name.startsWith('portal-'))
+                .map(repo => ({
+                    id: repo.id,
+                    name: repo.name,
+                    description: repo.description,
+                    githubUrl: repo.html_url,
+                })),
         },
     };
 }
