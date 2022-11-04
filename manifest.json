@@ -2,5 +2,6 @@
     "identifier": "gateway",
     "name": "Portal Gateway",
     "description": "The portal that brings everything together!",
+    "homepage": "https://portal.cstoica.space/",
     "hidden": true
 }

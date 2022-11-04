@@ -1,30 +1,34 @@
 import Card from '../components/Card';
-
-interface RawRepository {
-    id: number;
-    name: string;
-    description: string;
-    html_url: string;
-}
-
-interface Repository {
-    id: number;
-    name: string;
-    description: string;
-    githubUrl: string;
-}
+import { getRepositories, Repository } from '../core/repositories';
+import classNames from 'classnames';
 
 interface PageProps {
     repositories: Repository[];
 }
 
+const responsiveGridClass = classNames([
+    'grid justify-center items-center w-full gap-5',
+    'lg:grid-cols-4',
+    'md:grid-cols-2',
+    'sm:grid-cols1',
+]);
+
+const responsivePageContainer = classNames([
+    'h-screen flex items-center px-6 py-6',
+    'xl:px-64 xl:py-32',
+    'lg:px-48 lg:py-24',
+    'md:px-24 md:py-16',
+    'sm:px-12 sm:py-12',
+]);
+
 export default function Gateway({ repositories }: PageProps) {
     return (
-        <div>
-            <ul className="flex justify-center align-center ">
+        <div className={responsivePageContainer}>
+            <ul className={responsiveGridClass}>
                 {repositories.map(repo => (
                     <Card key={repo.id}>
-                        {repo.name}
+                        <h2 className="text-lg font-medium">{repo.name}</h2>
+                        <p className="text-sm mt-4">{repo.description}</p>
                     </Card>
                 ))}
             </ul>
@@ -33,24 +37,10 @@ export default function Gateway({ repositories }: PageProps) {
 }
 
 export async function getStaticProps() {
-    const response = await fetch('https://api.github.com/user/repos', {
-        headers: {
-            Authorization: `Bearer ${process.env.GITHUB_API_KEY}`,
-        }
-    });
-
-    const allRepositories: RawRepository[] = await response.json();
+    const repositories = await getRepositories();
 
     return {
         revalidate: 86400,
-        props: {
-            repositories: allRepositories.filter(repo => repo.name.startsWith('portal-'))
-                .map(repo => ({
-                    id: repo.id,
-                    name: repo.name,
-                    description: repo.description,
-                    githubUrl: repo.html_url,
-                })),
-        },
+        props: { repositories },
     };
 }
