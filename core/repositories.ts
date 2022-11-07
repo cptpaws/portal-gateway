@@ -1,5 +1,3 @@
-import repositories from './mock-repositories.json';
-
 interface RawRepository {
     id: number;
     name: string;
@@ -11,6 +9,7 @@ export interface Repository {
     id: number;
     name: string;
     description: string;
+    homepage: string;
     githubUrl: string;
     githubHandle: string;
 }
@@ -42,8 +41,6 @@ export async function getRepositories(): Promise<Repository[]> {
 
         return response.json();
     }));
-
-    return repositories;
 
     return portalRepositories.filter((repo, idx) => process.env.APP_ENV !== 'production' || !manifestFiles[idx].hidden)
         .map((repo, idx) => ({
